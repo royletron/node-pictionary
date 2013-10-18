@@ -1,36 +1,73 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Word!</title>
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <div class="pure-g-r" id="layout">
+<head>
+  <title>Word!</title>
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+</head>
+<body>
+  <div class="pure-g-r" id="layout">
     <div class="sidebar pure-u">
-        <header class="header">
-            <hgroup>
-                <h1 class="brand-title">Pick</h1>
-                <h2 class="brand-tagline">Draw something</h2>
-            </hgroup>
-          <%- partial('navigation') %>
-        </header>
+      <% if (logged){ %>
+      <div class="avatar">
+        <img src="<%= user.avatar %>" />
+        <p><%= user.username %><br /><small><a href="/logout">logout</small></a></p>
+      </div>
+      <% } %>
+      <header class="header">
+        <hgroup>
+          <h1 class="brand-title">Pick</h1>
+          <h2 class="brand-tagline">Draw something</h2>
+        </hgroup>
+        <nav class="nav">
+          <ul class="nav-list">
+            <% if (!logged) { %>
+            <li class="nav-item">
+              <a class="pure-button" href="/auth/twitter"><i class="icon-twitter icon-large"></i> Sign in</a>
+            </li>
+            <% } else { %>
+              <li class="nav-item">
+                <a class="pure-button" href="http://yuilibrary.com"><i class="icon-bullhorn icon-large"></i> Start</a>
+              </li>
+              <li class="nav-item">
+                <a class="pure-button" href="http://yuilibrary.com"><i class="icon-group icon-large"></i> Join</a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      </header>
     </div>
 
     <div class="pure-u-1">
-        <div class="content">
-          <%-body %>
-          <footer class="footer">
-                <div class="pure-menu pure-menu-horizontal pure-menu-open">
-                    <ul>
-                        <li><a href="http://purecss.io/">About</a></li>
-                        <li><a href="http://twitter.com/yuilibrary/">Twitter</a></li>
-                        <li><a href="http://github.com/yui/pure/">Github</a></li>
-                    </ul>
-                </div>
-            </footer>
-        </div>
+      <div class="content">
+        <% if (messages.success) { %>
+          <aside class="flash pure-button-success"><p><%= messages.success %></p></aside>
+        <% } %>
+        <% if (messages.info) { %>
+          <aside class="flash pure-button-secondary"><p><%= messages.info %></p></aside>
+        <% } %>
+        <% if (messages.fail) { %>
+          <aside class="flash pure-button-error"><p><%= messages.fail %></p></aside>
+        <% } %>
+        <%-body %>
+        <footer class="footer">
+          <div class="pure-menu pure-menu-horizontal pure-menu-open">
+            <ul>
+              <li><a href="http://purecss.io/">About</a></li>
+              <li><a href="http://twitter.com/yuilibrary/">Twitter</a></li>
+              <li><a href="http://github.com/yui/pure/">Github</a></li>
+            </ul>
+          </div>
+        </footer>
+      </div>
     </div>
-</div>
-  </body>
+  </div>
+  <script>
+    $(document).ready(function(){
+      $('.flash').delay(7000).slideUp('slow');
+    })
+  </script>
+</body>
 </html>

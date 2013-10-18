@@ -6,6 +6,7 @@
 var express = require('express')
   , conf = require('./conf')
   , users = require('./users')
+  , flash = require('express-flash')
   , engine = require('ejs-locals');
 var routes = require('./routes');
 var user = require('./routes/user');
@@ -26,6 +27,7 @@ app.configure(function() {
   app.use(express.static('public'));
   app.use(express.cookieParser());
   app.use(express.bodyParser());
+  app.use(flash());
   app.use(express.session({ secret: 'boom boom shake' }));
   app.use(passport.initialize());
   app.use(passport.session());
@@ -40,8 +42,9 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/draw', routes.draw);
-app.get('/users', user.list);
-app.get('/success', user.user);
+app.get('/success', routes.success);
+app.get('/fails', routes.fails);
+app.get('/logout', routes.logout);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

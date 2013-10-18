@@ -31,7 +31,7 @@ a:focus {
 
 .header {
     margin: 50% 2em 0;
-    text-align: right;
+    text-align: center;
 }
 
 .brand-title,
@@ -39,7 +39,7 @@ a:focus {
     margin: 0;
 }
 .brand-title {
-    text-transform: uppercase;
+    /*text-transform: uppercase; */
 }
 .brand-tagline {
     font-weight: 300;
@@ -173,4 +173,64 @@ a:focus {
     .content {
         padding: 2em 1em 0;
     }
+}
+.pure-button-success,
+        .pure-button-error,
+        .pure-button-warning,
+        .pure-button-secondary {
+            color: white;
+            border-radius: 4px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .pure-button-success {
+            background: rgb(28, 184, 65); /* this is a green */
+        }
+
+        .pure-button-error {
+            background: rgb(202, 60, 60); /* this is a maroon */
+        }
+
+        .pure-button-warning {
+            background: rgb(223, 117, 20); /* this is an orange */
+        }
+
+        .pure-button-secondary {
+            background: rgb(66, 184, 221); /* this is a light blue */
+        }
+
+aside {
+    background: #1f8dd6; /* same color as selected state on site menu */
+    padding: 0.3em 1em;
+    border-radius: 3px;
+    color: #fff;
+}
+    aside a, aside a:visited {
+        color: rgb(169, 226, 255);
+    }
+    .avatar{
+        float:clear;
+        margin: 20px 2em 0;
+        text-align: right;
+    }
+    .avatar p{
+        padding-top:5px;
+        float:right;
+        font-size: 1.2em;
+    }
+    .avatar img {
+        float:right;
+    margin-top: 1em;
+    margin-right: 1em;
+    position: relative;
+    margin-right:0px;
+    margin-left:10px;
+    border-radius: 2px;
+
+    border: 3px solid rgb(103, 103, 180);
+
+   
+}
+.flash{
+    margin-bottom: 20px;
 }
