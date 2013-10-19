@@ -13,7 +13,7 @@ exports.index = function(req, res){
 };
 
 exports.draw = function(req, res){
-  res.render('draw', { active: 'draw', logged: isLogged(req) });
+  res.render('draw', { active: 'draw', logged: isLogged(req), user: req.user });
 };
 
 exports.success = function(req, res){
