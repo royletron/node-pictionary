@@ -18,7 +18,7 @@ var passport = require('passport')
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 80);
 
 app.engine('ejs', engine);
 app.set('views', path.join(__dirname, 'views'));
