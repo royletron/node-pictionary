@@ -12,6 +12,7 @@
     "passport-twitter": "~1.0.2",
     "less-middleware": "~0.1.12",
     "express-flash": "0.0.2",
-    "randword": "~0.1.0"
+    "randword": "~0.1.0",
+    "mongoose": "~3.6.20"
   }
 }
