@@ -13,8 +13,15 @@ exports.index = function(req, res){
 };
 
 exports.draw = function(req, res){
-  res.render('draw', { active: 'draw', logged: isLogged(req), user: req.user });
+  if(isLogged(req))
+    res.render('draw', { active: 'draw', logged: isLogged(req), user: req.username });
+  else
+    res.render('signin', { active: '', logged: isLogged(req)});
 };
+
+exports.signin = function(req, res){
+  res.render('signin', { active: '', logged: isLogged(req)});
+}
 
 exports.success = function(req, res){
   req.flash('success', 'Yo '+req.user.username+' you is now logged in!');
@@ -33,7 +40,10 @@ exports.logout = function(req, res){
 }
 
 exports.start = function(req, res){
-  getWords(res, 'start', { active: 'start', logged: isLogged(req), user: req.user, words: [] });
+  if(isLogged(req))
+    getWords(res, 'start', { active: 'start', logged: isLogged(req), user: req.user, words: [] });  
+  else
+    res.render('signin', { active: '', logged: isLogged(req)});
 }
 
 function getWords(res, request, vars){

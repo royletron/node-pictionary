@@ -18,7 +18,7 @@ var passport = require('passport')
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 80);
+app.set('port', process.env.PORT || 3000);
 
 app.engine('ejs', engine);
 app.set('views', path.join(__dirname, 'views'));
@@ -46,6 +46,7 @@ app.get('/success', routes.success);
 app.get('/fails', routes.fails);
 app.get('/logout', routes.logout);
 app.get('/start', routes.start);
+app.get('/signin', routes.signin);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
