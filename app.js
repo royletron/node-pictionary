@@ -5,7 +5,7 @@
 
 var express = require('express')
   , conf = require('./conf')
-  , users = require('./users')
+  , db = require('./db')
   , flash = require('express-flash')
   , engine = require('ejs-locals');
 var routes = require('./routes');
@@ -45,6 +45,7 @@ app.get('/draw', routes.draw);
 app.get('/success', routes.success);
 app.get('/fails', routes.fails);
 app.get('/logout', routes.logout);
+app.get('/start', routes.start);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
@@ -54,10 +55,22 @@ var io = require('socket.io').listen(server)
 
 io.set('loglevel',10) // set log level to get all debug messages
 
+var usernames = {};
+
 io.sockets.on('connection',function(socket){
   //socket.emit('init',{msg:"test"});
+  socket.emit('init',{msg:"Connected, now get a room!"});
+  socket.on('adduser', function(username, room){
+    socket.username = username;
+    socket.room = room;
+    socket.join(room);
+    socket.emit('init', {msg:"You have joined "+room});
+  })
   socket.on('send', function (data) {
     io.sockets.emit('message', data);
+  });
+  socket.on('draw', function(data){
+    io.sockets.in(socket.room).emit('draw_update', data);
   });
 });
 
@@ -71,12 +84,12 @@ passport.use(new TwitterStrategy({
       if (err) { return done(err); }
       done(null, user);
     });*/
-    users.User.findOne({twitterID: profile.id}, function(err, oldUser){
+    db.User.findOne({twitterID: profile.id}, function(err, oldUser){
       if(oldUser){
         done(null, oldUser);
       }
       else{
-        var newUser = new users.User({
+        var newUser = new db.User({
           twitterID: profile.id,
           name: profile.displayName,
           username: profile.username,
@@ -97,12 +110,12 @@ passport.serializeUser(function(user, done) {
 
 
 passport.deserializeUser(function(id, done) {
-    users.User.findById(id,function(err,user){
+    db.User.findById(id,function(err,user){
         if(err) done(err);
         if(user){
             done(null,user);
         }else{
-            users.User.findById(id, function(err,user){
+            db.User.findById(id, function(err,user){
                 if(err) done(err);
                 done(null,user);
             });
@@ -113,4 +126,4 @@ passport.deserializeUser(function(id, done) {
 app.get('/auth/twitter', passport.authenticate('twitter'));
 app.get('/auth/twitter/callback', 
   passport.authenticate('twitter', { successRedirect: '/success',
-                                     failureRedirect: '/login' }));
+                                     failureRedirect: '/fails ' }));

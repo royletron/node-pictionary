@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
   <head>
     <title>HTML5 Create HTML5 Canvas JavaScript Drawing App Example</title>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
     <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
-    <script type="text/javascript" src="javascripts/html5-canvas-drawing-app.js"></script>
+<!--    <script type="text/javascript" src="javascripts/html5-canvas-drawing-app.js"></script>
     <script type="text/javascript" src="javascripts/html2canvas.js"></script>
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -17,4 +17,90 @@
     	 prepareCanvas();
 });</script>
   </body>
-</html>
+  </html>-->
+  <% layout('layout') -%>
+  <div class="canvas">
+    <canvas id="paint"></canvas>
+  </div>
+
+  <script>
+  var socket = io.connect('http://192.168.0.9:3000'); 
+  socket.on('connect', function(){
+    socket.emit('adduser', "royletron", "toast");
+  });
+  socket.on('init', function (data) {
+    console.log(data.msg);
+  });
+    var canvas = document.querySelector('#paint');
+    var ctx = canvas.getContext('2d');
+
+    var sketch = document.querySelector('.canvas');
+    var sketch_style = getComputedStyle(sketch);
+    canvas.width = parseInt(sketch_style.getPropertyValue('width'));
+    canvas.height = parseInt(sketch_style.getPropertyValue('height'));
+
+    var mouse = {x: 0, y: 0};
+    var last_mouse = {x: 0, y: 0};
+
+    /* Mouse Capturing Work */
+    canvas.addEventListener('mousemove', function(e) {
+      last_mouse.x = mouse.x;
+      last_mouse.y = mouse.y;
+
+      mouse.x = e.pageX - this.offsetLeft;
+      mouse.y = e.pageY - this.offsetTop;
+    }, false);
+
+
+    /* Drawing on Paint App */
+    ctx.lineWidth = 4;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#6767B4';
+
+    canvas.addEventListener('mousedown', function(e) {
+      currentLine = [];
+      canvas.addEventListener('mousemove', onPaint, false);
+    }, false);
+
+    canvas.addEventListener('mouseup', function() {
+      canvas.removeEventListener('mousemove', onPaint, false);
+      updateServer();
+    }, false);
+
+    canvas.addEventListener('mouseout', function() {
+      canvas.removeEventListener('mousemove', onPaint, false);
+      updateServer();
+    }, false);
+var currentLine = [];
+var drawer = false;
+function updateServer(){
+  socket.emit("draw", currentLine);
+  currentLine = [];
+}
+var onPaint = function() {
+  var update = {fromx: last_mouse.x, fromy: last_mouse.y, tox: mouse.x, toy: mouse.y, colour: ctx.strokeStyle};
+  paint(update);
+  currentLine.push(update);
+  //socket.emit("draw", update);
+};
+
+var paint = function(data) {
+  ctx.beginPath();
+  ctx.moveTo(data.fromx, data.fromy);
+  ctx.lineTo(data.tox, data.toy);
+  ctx.closePath();
+  ctx.stroke();
+}
+socket.on('draw_update', function (data) {
+  console.log(data);
+  if(!drawer)
+    updateDrawing(data);
+  //paint(data);
+});
+function updateDrawing(data){
+  $.each(data, function(idx, val){
+    paint(val);
+  })
+}
+</script>

@@ -14,11 +14,20 @@ var userSchema = mongoose.Schema({
   username: String,
   avatar: String,
   twitterID: String
-})
+});
+
+var roomSchema = mongoose.Schema({
+  name: String,
+  user: String,
+  drawing: [{fromx: Number, fromy: Number, tox: Number, toy: Number, colour: String}],
+  date: { type: Date, default: Date.now }
+});
 
 var User = mongoose.model('users', userSchema);
+var Room = mongoose.model('rooms', roomSchema);
 
 exports.User = User;
+exports.Room = Room;
 
 exports.createOrLogin = function (profile, done){
   var user = User.find
