@@ -785,3 +785,18 @@ aside {
     padding-left:4px;
     padding-right:8px;
 }
+img.bordered {
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    background-color:#E3A20B;
+    -webkit-box-shadow: #B3B3B3 1px 1px 1px;
+    -moz-box-shadow: #B3B3B3 1px 1px 1px; 
+    box-shadow: #B3B3B3 1px 1px 1px;
+}
+.wrap{
+    min-height:100%;
+}
+.legal{
+    margin-top:-137px;
+}

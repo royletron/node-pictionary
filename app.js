@@ -16,6 +16,7 @@ var passport = require('passport')
   , TwitterStrategy = require('passport-twitter').Strategy;
 
 var app = express();
+var _ = require('underscore');
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -47,6 +48,8 @@ app.get('/fails', routes.fails);
 app.get('/logout', routes.logout);
 app.get('/start', routes.start);
 app.get('/signin', routes.signin);
+app.get('/create/:id', routes.create);
+app.get('/join/:id', routes.join);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
@@ -62,10 +65,31 @@ io.sockets.on('connection',function(socket){
   //socket.emit('init',{msg:"test"});
   socket.emit('init',{msg:"Connected, now get a room!"});
   socket.on('adduser', function(username, room){
-    socket.username = username;
-    socket.room = room;
-    socket.join(room);
-    socket.emit('init', {msg:"You have joined "+room});
+    db.Room.findOne({name: room}, function(err, dbRoom){
+      if(dbRoom){
+        db.User.findOne({username: username}, function(err, userData){
+          var isin = false;
+          _.each(dbRoom.users, function(val, idx){
+            if(userData.username == val.name)
+              isin = true;
+          })
+          if(!isin)
+            dbRoom.users.addToSet({name: userData.username, avatar: userData.avatar});
+          dbRoom.save();
+          socket.username = username;
+          socket.room = room;
+          socket.join(room);
+          console.log(io.sockets.in(socket.room));
+          socket.emit('init', {msg:"You have joined "+room, });
+          io.sockets.in(socket.room).emit('users', {users: dbRoom.users})
+        });
+        /*
+        socket.emit*/
+      }
+      else{
+        socket.emit('error', {msg:"Can't find the room!?"});
+      }
+    })
   })
   socket.on('send', function (data) {
     io.sockets.emit('message', data);
@@ -78,7 +102,7 @@ io.sockets.on('connection',function(socket){
 passport.use(new TwitterStrategy({
     consumerKey: 'S3IDJkTdZLsuoK378cz57Q',
     consumerSecret: 'LYYjs4DbwHcPzzjWrgaVifHmdFJiBXamNoRU5rBIn7I',
-    callbackURL: "http://picturetime.herokuapp.com/auth/twitter/callback"
+    callbackURL: "http://picturetime.herokuapp.com:3000/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
     /*User.findOrCreate(..., function(err, user) {

@@ -4,7 +4,7 @@
   <h2>Hope you have lots of friends</h2>
 </div>
 <div class="content" style="text-align:center">
-  <h2 class="content-subhead">Pick a name</h2>
+  <h2 class="content-subhead" style="margin-top:10px;">Pick a name</h2>
   <div class="pure-g">
     <div class="pure-u-1-4"></div>
     <div class="pure-u-1-2">
@@ -18,12 +18,13 @@
     </div>
   </div>
   <p>Then...</p>
-  <a class="pure-button pure-button-success pure-button-disabled" href="#"><i class="icon-smile"></i> Click to start!</a>
+  <a class="pure-button pure-button-success pure-button-disabled" id="go" href=""><i class="icon-smile"></i> Click to start!</a>
 </div>
 <script>
 $('.word-button').click(function(evt){
   $('.word-button').removeClass('pure-button-success');
   $(evt.target).addClass('pure-button-success');
   $('.pure-button').removeClass('pure-button-disabled');
+  $('#go').attr("href", "/create/"+$(evt.target).html());
 });
 </script>

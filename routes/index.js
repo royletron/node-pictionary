@@ -2,10 +2,10 @@
 /*
  * GET home page.
  */
-var randword = require('randword');
-var db = require('../db');
+ var randword = require('randword');
+ var db = require('../db');
 
-function isLogged(req){
+ function isLogged(req){
   return req.user != undefined
 }
 exports.index = function(req, res){
@@ -14,7 +14,7 @@ exports.index = function(req, res){
 
 exports.draw = function(req, res){
   if(isLogged(req))
-    res.render('draw', { active: 'draw', logged: isLogged(req), user: req.username });
+    res.render('draw', { active: 'draw', logged: isLogged(req), user: req.user });
   else
     res.render('signin', { active: '', logged: isLogged(req)});
 };
@@ -46,9 +46,60 @@ exports.start = function(req, res){
     res.render('signin', { active: '', logged: isLogged(req)});
 }
 
+exports.join = function(req, res){
+  if(isLogged(req))
+  {
+    db.Room.findOne({name: req.params.id}, function(err, room){
+      if(!room){
+
+      }
+      else{
+        res.render('lobby', { active: 'start', logged: isLogged(req), user: req.user, room: room });
+      }
+    })
+  }
+  else{
+    res.render('signin', { active: '', logged: isLogged(req)});
+  }
+}
+
+exports.create = function(req, res){
+  if(isLogged(req))
+  {
+    db.Room.findOne({name: req.params.id}, function(err, oldRoom){
+      if(!oldRoom)
+      {
+        var newRoom = new db.Room({
+          name: req.params.id,
+          user: req.user.username,
+          drawing: []
+        }).save(function(err, newRoom){
+          if(err) throw err;
+          res.render('lobby', { active: 'start', logged: isLogged(req), user: req.user, room: newRoom })
+        });
+      }
+      else
+      {
+        if(oldRoom.user == req.user.username)
+        {
+          res.render('lobby', { active: 'start', logged: isLogged(req), user: req.user, room: oldRoom });
+        }
+        else
+        {
+          req.flash('fail', 'I don\'t know what you\'re doing, but I don\'t like it!');
+          res.render('home', { active: '', logged: isLogged(req), user: req.user });
+        }
+      }
+    });
+  }
+  else
+  {
+    res.render('signin', { active: '', logged: isLogged(req)});
+  }
+}
+
 function getWords(res, request, vars){
-  console.log(vars);
-  if(vars.words.length < 5)
+  if(vars.words.length < 10)
   {
     randword(function(err, word) {
       db.Room.findOne({name: word}, function(err, currentRoom){

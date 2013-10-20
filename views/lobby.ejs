@@ -1,0 +1,28 @@
+<% layout('layout') -%>
+<div class="header">
+  <h1>This is the <strong><%= room.name %></strong> room</h1>
+  <h2 id="status">Just waiting for <%= room.user %> to start. Just wait here.</h2>
+  <% if(room.user == user.username){ %><h4>This is your room!</h4><% } %>
+</div>
+  <div class="hero-cta">
+      <pre class="snippet" id="testList"></pre>
+    </div>
+
+<script>
+  
+  var socket = io.connect('http://picturetime.herokuapp.com:3000'); 
+  socket.on('connect', function(){
+    socket.emit('adduser', "<%= user.username %>", "<%= room.name %>");
+  });
+  socket.on('init', function (data) {
+    console.log(data.msg);
+  });
+  socket.on('users', function (data) {
+    $("#testList").empty();
+    $.each(data.users, function(idx, val){
+      console.log(val);
+      $("#testList").append("<span><img class='avatar' src='"+val.avatar+"' /> "+val.name+"</span> ");
+    })
+  });
+
+</script>

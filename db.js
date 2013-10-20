@@ -19,6 +19,8 @@ var userSchema = mongoose.Schema({
 var roomSchema = mongoose.Schema({
   name: String,
   user: String,
+  users: [{name: String, avatar: String}],
+  started: { type: Boolean, default: false },
   drawing: [{fromx: Number, fromy: Number, tox: Number, toy: Number, colour: String}],
   date: { type: Date, default: Date.now }
 });
