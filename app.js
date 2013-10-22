@@ -50,6 +50,7 @@ app.get('/start', routes.start);
 app.get('/signin', routes.signin);
 app.get('/create/:id', routes.create);
 app.get('/join/:id', routes.join);
+app.get('/play/:id', routes.play);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
@@ -60,7 +61,10 @@ var io = require('socket.io').listen(server)
 io.set('loglevel',10) // set log level to get all debug messages
 
 var usernames = {};
-
+var colours = ["E08E79", "F1D4AF", "ECE5CE", "C5E0DC", "F4FCE2", "D3EBC7", "FFFFF7", "E9FCCF", "D8FCB3", "FFE1C9", "FAC7B4", "F7D7CD", "F3E7D7", "DFCCCC", "FFD3D3","EDF6F9", "CDD3D8", "CDE5E5", "FFF6DF", "8AC8C3","F3FFCC", "E9FCD9","DEFAE6","D4F7F2","C9F4FF", "EFC9B6", "F5E0CF","F6EAEA","FDFDFD"];
+function getColour() {
+   return colours[Math.floor(Math.random() * colours.length)];
+}
 io.sockets.on('connection',function(socket){
   //socket.emit('init',{msg:"test"});
   socket.emit('init',{msg:"Connected, now get a room!"});
@@ -68,19 +72,12 @@ io.sockets.on('connection',function(socket){
     db.Room.findOne({name: room}, function(err, dbRoom){
       if(dbRoom){
         db.User.findOne({username: username}, function(err, userData){
-          var isin = false;
-          _.each(dbRoom.users, function(val, idx){
-            if(userData.username == val.name)
-              isin = true;
-          })
-          if(!isin)
-            dbRoom.users.addToSet({name: userData.username, avatar: userData.avatar});
+          dbRoom.users.addToSet({_id: username, avatar: userData.avatar, colour: getColour()});
           dbRoom.save();
           socket.username = username;
           socket.room = room;
           socket.join(room);
-          console.log(io.sockets.in(socket.room));
-          socket.emit('init', {msg:"You have joined "+room, });
+          socket.emit('init', {msg:"You have joined "+room });
           io.sockets.in(socket.room).emit('users', {users: dbRoom.users})
         });
         /*
@@ -96,6 +93,27 @@ io.sockets.on('connection',function(socket){
   });
   socket.on('draw', function(data){
     io.sockets.in(socket.room).emit('draw_update', data);
+  });
+  socket.on('start', function(){
+    db.Room.findOne({name: socket.room}, function(err, dbRoom){
+      if(dbRoom)
+        if(dbRoom.user == socket.username)
+        {
+          console.log("Yay");
+          dbRoom.started = true;
+          dbRoom.current = dbRoom.user;
+        }
+    })
+  })
+  socket.on('disconnect', function () {
+    socket.leave(socket.room);
+    db.Room.findOne({name: socket.room}, function(err, dbRoom){
+      if(dbRoom){
+        dbRoom.users.pull(socket.username);
+        dbRoom.save();
+        io.sockets.in(socket.room).emit('users', {users: dbRoom.users})
+      }
+    })
   });
 });
 

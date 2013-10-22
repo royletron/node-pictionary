@@ -1,14 +1,28 @@
 <% layout('layout') -%>
 <div class="header">
   <h1>This is the <strong><%= room.name %></strong> room</h1>
-  <h2 id="status">Just waiting for <%= room.user %> to start. Just wait here.</h2>
-  <% if(room.user == user.username){ %><h4>This is your room!</h4><% } %>
+  <% if(room.user != user.username){ %>
+    <h2>Just wait here until <%= room.user %> starts</h2>
+  <% } %>
 </div>
-  <div class="hero-cta">
+<div class="content">
+  <div id="testList" class="pure-g-r">
+  </div>
+</div>
+<!--
+  <div class="hero-cta" style="text-align:center">
+    <h3 class="content-subhead" style="margin-top:10px;">The guest list so far...</h3>
       <pre class="snippet" id="testList"></pre>
     </div>
-
-<script>
+  -->
+  <div class="content">
+    <% if(room.user == user.username){ %>
+      <p style="text-align:center">
+        This is your room, so when you have the right people<br /><a id="startButton" class="pure-button pure-button-disabled">Click here to start</a>
+      </p>
+    <% } %>
+  </div>
+  <script>
   
   var socket = io.connect('http://picturetime.herokuapp.com:3000'); 
   socket.on('connect', function(){
@@ -16,13 +30,19 @@
   });
   socket.on('init', function (data) {
     console.log(data.msg);
+    $('#startButton').removeClass('pure-button-disabled');
   });
+  $(document).ready(function(){
+    $('#startButton').click(function(){
+      socket.emit('start');
+    });
+  })
   socket.on('users', function (data) {
     $("#testList").empty();
     $.each(data.users, function(idx, val){
       console.log(val);
-      $("#testList").append("<span><img class='avatar' src='"+val.avatar+"' /> "+val.name+"</span> ");
+      $("#testList").append("<div class='pure-u-1-4'><div class='avatar-card bordered' style='background-color:#"+val.colour+"'><img class='avatar' src='"+val.avatar+"' /> "+val._id+"</div></div>");
     })
   });
 
-</script>
+  </script>

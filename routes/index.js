@@ -6,11 +6,16 @@
  var db = require('../db');
 
  function isLogged(req){
+  req.session.lastPage = req.url;
   return req.user != undefined
 }
 exports.index = function(req, res){
-  res.render('index', { active: 'index', logged: isLogged(req)});
+  res.render('index', { active: 'index', logged: isLogged(req), user: req.user});
 };
+
+exports.play = function(req, res){
+  
+}
 
 exports.draw = function(req, res){
   if(isLogged(req))
@@ -25,7 +30,10 @@ exports.signin = function(req, res){
 
 exports.success = function(req, res){
   req.flash('success', 'Yo '+req.user.username+' you is now logged in!');
-  res.render('home', { active: 'home', logged: isLogged(req), user: req.user });
+  if(req.session.lastPage)
+    res.redirect(req.session.lastPage);
+  else
+    res.render('home', { active: 'home', logged: isLogged(req), user: req.user });
 };
 
 exports.fails = function(req, res){
@@ -60,6 +68,13 @@ exports.join = function(req, res){
   }
   else{
     res.render('signin', { active: '', logged: isLogged(req)});
+  }
+}
+
+exports.play = function(req, res){
+  if(isLogged(req))
+  {
+
   }
 }
 
