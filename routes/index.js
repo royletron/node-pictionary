@@ -14,7 +14,14 @@ exports.index = function(req, res){
 };
 
 exports.play = function(req, res){
-  
+  db.Room.findOne({name: req.params.id}, function(err, room){
+    if(!room){
+      res.render('error', {active: '', logged: isLogged(req), user: req.user});
+    }
+    else{
+      res.render('draw', {active: 'draw', logged: isLogged(req), user: req.user, room: room});
+    }
+  })
 }
 
 exports.draw = function(req, res){
@@ -62,19 +69,15 @@ exports.join = function(req, res){
 
       }
       else{
-        res.render('lobby', { active: 'start', logged: isLogged(req), user: req.user, room: room });
+        if(room.started)
+          res.render('draw', {active: 'draw', logged: isLogged(req), user: req.user, room: room});
+        else
+          res.render('lobby', { active: 'start', logged: isLogged(req), user: req.user, room: room });
       }
     })
   }
   else{
     res.render('signin', { active: '', logged: isLogged(req)});
-  }
-}
-
-exports.play = function(req, res){
-  if(isLogged(req))
-  {
-
   }
 }
 

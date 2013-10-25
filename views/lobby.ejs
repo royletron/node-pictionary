@@ -28,6 +28,9 @@
   socket.on('connect', function(){
     socket.emit('adduser', "<%= user.username %>", "<%= room.name %>");
   });
+  socket.on('move', function(data){
+    window.location.href = data.redirectUrl;
+  });
   socket.on('init', function (data) {
     console.log(data.msg);
     $('#startButton').removeClass('pure-button-disabled');

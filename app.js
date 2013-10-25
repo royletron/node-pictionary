@@ -69,6 +69,7 @@ io.sockets.on('connection',function(socket){
   //socket.emit('init',{msg:"test"});
   socket.emit('init',{msg:"Connected, now get a room!"});
   socket.on('adduser', function(username, room){
+    console.log(room);
     db.Room.findOne({name: room}, function(err, dbRoom){
       if(dbRoom){
         db.User.findOne({username: username}, function(err, userData){
@@ -79,6 +80,9 @@ io.sockets.on('connection',function(socket){
           socket.join(room);
           socket.emit('init', {msg:"You have joined "+room });
           io.sockets.in(socket.room).emit('users', {users: dbRoom.users})
+          console.log(dbRoom+"!!!!");
+          if(dbRoom.started)
+            socket.emit('imageinit', {drawing: dbRoom.drawing});
         });
         /*
         socket.emit*/
@@ -92,6 +96,18 @@ io.sockets.on('connection',function(socket){
     io.sockets.emit('message', data);
   });
   socket.on('draw', function(data){
+    console.log(socket.room);
+    db.Room.findOne({name: socket.room}, function(err, dbRoom){
+      if(dbRoom)
+      {
+        console.log(dbRoom);
+        for(var i = 0; i < data.length; i++)
+        {
+          dbRoom.drawing.addToSet(data[i]);
+        }
+        dbRoom.save();
+      }
+    });
     io.sockets.in(socket.room).emit('draw_update', data);
   });
   socket.on('start', function(){
@@ -99,9 +115,10 @@ io.sockets.on('connection',function(socket){
       if(dbRoom)
         if(dbRoom.user == socket.username)
         {
-          console.log("Yay");
           dbRoom.started = true;
           dbRoom.current = dbRoom.user;
+          dbRoom.save();
+          io.sockets.in(socket.room).emit('move', { redirectUrl: '/play/'+socket.room})
         }
     })
   })
