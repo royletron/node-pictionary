@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://root:oxford1@ds047968.mongolab.com:47968/piction');
 
+
 exports.mongoose = mongoose
 
 var db = mongoose.connection;
