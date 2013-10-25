@@ -120,7 +120,7 @@ io.sockets.on('connection',function(socket){
 passport.use(new TwitterStrategy({
     consumerKey: 'S3IDJkTdZLsuoK378cz57Q',
     consumerSecret: 'LYYjs4DbwHcPzzjWrgaVifHmdFJiBXamNoRU5rBIn7I',
-    callbackURL: "http://picturetime.herokuapp.com:3000/auth/twitter/callback"
+    callbackURL: "http://picturetime.herokuapp.com/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
     /*User.findOrCreate(..., function(err, user) {
